@@ -8,7 +8,33 @@
 
 import Foundation
 
-struct Money {
+protocol CustomStringConvertible {
+    var description: String {get}
+}
+
+protocol Mathematics {
+    mutating func addProtocol(amount: Double, cur: String)
+    mutating func subProtocol(amount: Double, cur: String)
+}
+
+extension Double {
+    var USD: Money {
+        return Money(amount: self, currency: "USD")
+    }
+    var EUR: Money {
+        return Money(amount: self, currency: "EUR")
+    }
+    var GBP: Money {
+        return Money(amount: self, currency: "GBP")
+    }
+    var YEN: Money {
+        return Money(amount: self, currency: "YEN")
+    }
+}
+
+struct Money: CustomStringConvertible, Mathematics {
+  
+    
     
     var amount: Double = 0
     var currency: String = "USD"
@@ -41,13 +67,47 @@ struct Money {
             
             let cr = currencyDict[currency]! / currencyDict [cur]!
             amount = amount * cr
-            self.amount += amount
+            self.amount -= amount
             
         }
         else {
             self.amount -= amount
         }
     }
+    
+    var description: String {
+        var toreturn = String(stringInterpolationSegment: amount) + currency
+        return toreturn
+    }
+    
+    mutating func addProtocol( var amt: Double, cur: String) {
+        
+        if cur != currency {
+            
+
+            let cr = currencyDict[currency]! / currencyDict [cur]!
+            amt = amt * cr
+            self.amount += amt
+            
+        }
+        else {
+            self.amount += amt
+        }
+    }
+    
+    mutating func subProtocol(var amt: Double, cur: String) {
+        
+        if cur != currency {
+            
+            let cr = currencyDict[currency]! / currencyDict [cur]!
+            amt = amt * cr
+            self.amount -= amt
+        }
+        else {
+            self.amount -= amt
+        }
+    }
+
     
 }
 
@@ -76,6 +136,14 @@ class Job {
     
     func raise (percentage: Double) {
         salary.amount = salary.amount + (salary.amount * (percentage/100.0))
+    }
+    
+    var description: String {
+        var toreturn: String = ""
+        
+        toreturn = "Title: " + title + ", Salary: " + salary.description + " " + salaryType
+        
+        return toreturn
     }
 }
 
@@ -115,7 +183,7 @@ class Person {
             print("First Name: \(firstName)")
             print("Last Name: \(lastName)")
             print("Age: \(age)")
-            print("Spouse: ", spouse!.firstName)
+            print("Spouse: ", &spouse!.firstName)
             return
         }
         
@@ -135,7 +203,15 @@ class Person {
         print("Age: \(age)")
         print("Job Title: \(job!.title)")
         print("Job Salary: \(job!.calculateIncome(0)) \(job!.salary.currency) \(job!.salaryType)")
-        print("Spouse: ", spouse!.firstName)
+        print("Spouse: ", &spouse!.firstName)
+    }
+    
+    var description: String {
+        var toreturn: String = ""
+        
+        toreturn = "First Name: " + firstName + "\nLast Name: " + lastName + "\nAge: " + String(age) + "\nJob " + job!.description
+        
+        return toreturn
     }
     
 }
@@ -179,6 +255,10 @@ class Family {
         }
         print("Family cannot be created emptying family list")
         members = []
+    }
+    
+    var description : String {
+        return "There are currently \(members.count) people in the family"
     }
 }
 
@@ -224,8 +304,39 @@ fam.printFamilyMembers()
 
 print("\nFamily Household Income = ",fam.houseHoldIncome())
 
+println()
+println("********************************************************")
+println("---------------- UNIT TESTS FOR PART 2 -----------------")
+println("********************************************************")
+
+println("Testing description for Money")
+println(x.job!.salary.description)
+println()
+
+println("Testing description for Job")
+println(x.job!.description)
+println()
+
+println("Testing description for Person")
+println(x.description)
+println()
+
+println("Testing description for Family")
+println(fam.description)
+println()
+
+println("Testing addition in Money using protocol Mathematics")
+x.job!.salary.addProtocol(20000, cur: "USD")
+println("Result after adding 20000: ",x.job!.salary.description)
+println()
+
+println("Testing subtraction in Money using protocol Mathematics")
+x.job!.salary.subProtocol(30000, cur: "USD")
+println("Result after adding 30000: ",x.job!.salary.description)
+println()
 
 
-
+println("Testing Double extension USD")
+print(5000.0.USD.description)
 
 
